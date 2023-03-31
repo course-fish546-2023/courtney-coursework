@@ -6,8 +6,10 @@ date: "2023-03-30"
 
 #Download Software
 
+library(tidyverse)
+install.packages("kableExtra")
+library("kableExtra")
 
-https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
 ```{bash}
 cd /home/jovyan/applications
 curl -O https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
@@ -59,9 +61,7 @@ grep -c ">" ../data/Ab_4denovo_CLC6_a.fa
 head -2 ../output/Ab_4-uniprot_blastx.tab
 wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
-```{bash}
-curl -O "Accept: text/plain; format=tsv" "https://rest.uniprot.org/uniprotkb/search?query=reviewed:true+AND+organism_id:9606"
-```
+
 ```{bash}
 curl -O -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab"
 ```
@@ -69,15 +69,29 @@ curl -O -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/
 head -2 ../output/Ab_4-uniprot_blastx.tab
 wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
+#I am stuck here... keep getting an error (tr: write error: Broken pipe)
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab | head -2
 ```
+#the chunk below won't run (doesn't even show errors--it just buffers breifly)
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab \
 > ../output/Ab_4-uniprot_blastx_sep.tab
 ```
+
+#this chunk works but is not consistent with the assignemnet instructions (it uses a .fasta file instead 
+# of a .tab)
 ```{bash}
-head -2 ../data/uniprot_table_r2023_01.tab
-wc -l ../data/uniprot_table_r2023_01.tab
+head -2 ../data/uniprot_sprot_r2023_01.fasta
+wc -l ../data/uniprot_sprot_r2023_01.fasta
 ```
-library(tidyverse)
+
+#this says that in file(file, "rt") that it cannot open this file (no file/directory)
+#not sure why it says this becuase this exact file is in my output folder
+bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
+
+#same error message as above 
+spgo <- read.csv("../data/uniprot_sprot_r2023_01.fasta", sep = '\t', header = TRUE)
+
+str(spgo)
+
