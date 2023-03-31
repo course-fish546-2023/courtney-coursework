@@ -102,46 +102,54 @@ grep -c ">" ../data/Ab_4denovo_CLC6_a.fa
 -outfmt 6
 ```
 
-
-
-
-
+Lets have a quick look
 
 ```{bash}
 head -2 ../output/Ab_4-uniprot_blastx.tab
 wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
 
-```{bash}
-curl -O -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab"
-```
-```{bash}
-head -2 ../output/Ab_4-uniprot_blastx.tab
-wc -l ../output/Ab_4-uniprot_blastx.tab
-```
-#I am stuck here... keep getting an error (tr: write error: Broken pipe)
+
+CS: I am stuck here... keep getting an error (tr: write error: Broken pipe)
+
+SR: no isssue for me
+
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab | head -2
 ```
-#the chunk below won't run (doesn't even show errors--it just buffers breifly)
+
+
+
+CS : the chunk below won't run (doesn't even show errors--it just buffers breifly)
+
+SR : no problem for me...
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab \
 > ../output/Ab_4-uniprot_blastx_sep.tab
 ```
 
-#this chunk works but is not consistent with the assignemnet instructions (it uses a .fasta file instead 
-# of a .tab)
-```{bash}
-head -2 ../data/uniprot_sprot_r2023_01.fasta
-wc -l ../data/uniprot_sprot_r2023_01.fasta
-```
+
 
 #this says that in file(file, "rt") that it cannot open this file (no file/directory)
 #not sure why it says this becuase this exact file is in my output folder
+
+SR - this needs to be a chunk..
+see also https://github.com/course-fish546-2023/assistance/issues/6#issuecomment-1491249160
+
+```{r}
 bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
+```
+
+
 
 #same error message as above 
+sr:fixed
+
+```{r}
 spgo <- read.csv("../data/uniprot_sprot_r2023_01.fasta", sep = '\t', header = TRUE)
+```
 
+
+```{r}
 str(spgo)
-
+```
