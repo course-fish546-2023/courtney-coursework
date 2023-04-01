@@ -5,10 +5,9 @@ date: "2023-03-30"
 ---
 
 #Download Software
-
 library(tidyverse)
-install.packages("kableExtra")
 library("kableExtra")
+library("dplyr")
 
 ```{bash}
 cd /home/jovyan/applications
@@ -63,35 +62,50 @@ wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
 
 ```{bash}
-curl -O -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab"
+curl -o "uniprot_table_r2023_01.tab" -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab"
 ```
 ```{bash}
 head -2 ../output/Ab_4-uniprot_blastx.tab
 wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
-#I am stuck here... keep getting an error (tr: write error: Broken pipe)
+
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab | head -2
 ```
-#the chunk below won't run (doesn't even show errors--it just buffers breifly)
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab \
 > ../output/Ab_4-uniprot_blastx_sep.tab
 ```
 
-#this chunk works but is not consistent with the assignemnet instructions (it uses a .fasta file instead 
+#this chunk works but is not consistent with the assignement instructions (it uses a .fasta file instead 
 # of a .tab)
 ```{bash}
-head -2 ../data/uniprot_sprot_r2023_01.fasta
-wc -l ../data/uniprot_sprot_r2023_01.fasta
+head -2 ../data/uniprot_table_r2023_01.tab
+wc -l ../data/uniprot_table_r2023_01.tab
 ```
 
-#this says that in file(file, "rt") that it cannot open this file (no file/directory)
-#not sure why it says this becuase this exact file is in my output folder
+```{r}
 bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
+```
 
-#same error message as above 
-spgo <- read.csv("../data/uniprot_sprot_r2023_01.fasta", sep = '\t', header = TRUE)
+```{r}
+spgo <- read.csv("../data/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
+```
 
+```{r}
 str(spgo)
+```
+```{r}
+left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab")) %>%
+  write_delim("../output/blast_annot_go.tab", delim = '\t')
+```
 
+```{r}
+annot_tab <- read.csv("../output/blast_annot_go.tab", sep = '\t', header = TRUE)
+```
+
+```{r}
+str(annot_tab)
+```
