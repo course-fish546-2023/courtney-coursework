@@ -1,0 +1,141 @@
+---
+title: "02-dge"
+output: html_document
+date: "2023-04-04"
+---
+
+```{bash}
+/home/shared/kallisto/kallisto
+```
+
+```{bash}
+cd ../data
+curl --insecure -O https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/rna.fna
+```
+
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+../data/cgigas_roslin_rna.index \
+../data/rna.fna
+```
+
+```{bash}
+cd ../data 
+wget --recursive --no-parent --no-directories \
+--no-check-certificate \
+--accept '*.fastq.gz' \
+https://gannet.fish.washington.edu/seashell/bu-github/nb-2023/Cgigas/data/nopp/
+```
+
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+../data/cgigas_roslin_rna.index \
+/home/shared/8TB_HDD_01/sr320/github/nb-2023/Cgigas/data/rna.fna
+```
+
+```{bash}
+find /home/shared/8TB_HDD_01/sr320/github/nb-2023/Cgigas/data/*_R1_001.fastq.gz \
+| xargs basename -s _R1_001.fastq.gz | xargs -I{} /home/shared/kallisto/kallisto \
+quant -i ../data/cgigas_roslin_rna.index \
+-o ../output/kallisto_01/{} \
+-t 40 \
+--single -l 100 -s 10 /home/shared/8TB_HDD_01/sr320/github/nb-2023/Cgigas/data/{}_R1_001.fastq.gz
+```
+
+```{bash}
+perl /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl \
+--est_method kallisto \
+    --gene_trans_map none \
+    --out_prefix ../output/kallisto_01 \
+    --name_sample_by_basedir \
+    ../output/kallisto_01/D54_S145_L002/abundance.tsv \
+    ../output/kallisto_01/D56_S136_L002/abundance.tsv \
+    ../output/kallisto_01/D58_S144_L002/abundance.tsv \
+    ../output/kallisto_01/M45_S140_L002/abundance.tsv \
+    ../output/kallisto_01/M48_S137_L002/abundance.tsv \
+    ../output/kallisto_01/M89_S138_L002/abundance.tsv \
+    ../output/kallisto_01/D55_S146_L002/abundance.tsv \
+    ../output/kallisto_01/D57_S143_L002/abundance.tsv \
+    ../output/kallisto_01/D59_S142_L002/abundance.tsv \
+    ../output/kallisto_01/M46_S141_L002/abundance.tsv \
+    ../output/kallisto_01/M49_S139_L002/abundance.tsv \
+    ../output/kallisto_01/M90_S147_L002/abundance.tsv \
+    ../output/kallisto_01/N48_S194_L002/abundance.tsv \
+    ../output/kallisto_01/N50_S187_L002/abundance.tsv \
+    ../output/kallisto_01/N52_S184_L002/abundance.tsv \
+    ../output/kallisto_01/N54_S193_L002/abundance.tsv \
+    ../output/kallisto_01/N56_S192_L002/abundance.tsv \
+    ../output/kallisto_01/N58_S195_L002/abundance.tsv \
+    ../output/kallisto_01/N49_S185_L002/abundance.tsv \
+    ../output/kallisto_01/N51_S186_L002/abundance.tsv \
+    ../output/kallisto_01/N53_S188_L002/abundance.tsv \
+    ../output/kallisto_01/N55_S190_L002/abundance.tsv \
+    ../output/kallisto_01/N57_S191_L002/abundance.tsv \
+    ../output/kallisto_01/N59_S189_L002/abundance.tsv
+```
+
+```{r}
+library(DESeq2)
+library(tidyverse)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+```
+```{r}
+BiocManager::install("DESeq2")
+```
+
+```{r}
+countmatrix <- read.delim("../output/kallisto_01.isoform.counts.matrix", header = TRUE, sep = '\t')
+rownames(countmatrix) <- countmatrix$X
+countmatrix <- countmatrix[,-1]
+head(countmatrix)
+```
+
+```{r}
+countmatrix <- round(countmatrix, 0)
+str(countmatrix)
+```
+
+```{r}
+deseq2.colData <- data.frame(condition=factor(c(rep("control", 12), rep("desicated", 12))), 
+                             type=factor(rep("single-read", 24)))
+rownames(deseq2.colData) <- colnames(data)
+deseq2.dds <- DESeqDataSetFromMatrix(countData = countmatrix,
+                                     colData = deseq2.colData, 
+                                     design = ~ condition)
+```
+
+```{r}
+deseq2.dds <- DESeq(deseq2.dds)
+deseq2.res <- results(deseq2.dds)
+deseq2.res <- deseq2.res[order(rownames(deseq2.res)), ]
+```
+
+```{r}
+head(deseq2.res)
+```
+```{r}
+# Count number of hits with adjusted p-value less then 0.05
+dim(deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ])
+```
+
+```{r}
+tmp <- deseq2.res
+# The main plot
+plot(tmp$baseMean, tmp$log2FoldChange, pch=20, cex=0.45, ylim=c(-3, 3), log="x", col="darkgray",
+     main="DEG Dessication  (pval <= 0.05)",
+     xlab="mean of normalized counts",
+     ylab="Log2 Fold Change")
+# Getting the significant points and plotting them again so they're a different color
+tmp.sig <- deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ]
+points(tmp.sig$baseMean, tmp.sig$log2FoldChange, pch=20, cex=0.45, col="red")
+# 2 FC lines
+abline(h=c(-1,1), col="blue")
+```
+
+```{r}
+write.table(tmp.sig, "../output/DEGlist.tab", row.names = T)
+```
