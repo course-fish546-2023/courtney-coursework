@@ -1,7 +1,7 @@
 ## Week 02 Question Set
 
 a)  **What do you feel was the most impressive thing you did in class last week was?**
-Learn how to connect my work in R to github. Small step for most, but I thought it was really neat to finally make it happen!
+Learn how to connect my work in R to github. Small step for most, but I thought it was really neat to finally make it happen! (Perhaps I said this prematurely since I didn't push the correct version of my homework)
 
 b)  **What is your weekly goal for making progress on your project? What is the next step?**
 Laura sent me the snow crab data and some notes, so I would like to look through the contents to get an idea of what I am working with. 
