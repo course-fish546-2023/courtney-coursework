@@ -4,29 +4,24 @@ output: html_document
 date: "2023-03-30"
 ---
 
-#Download Software
-
-
-Will need this later on..
+# Download Software
+&&& this needs to be a chunk
 
 ```{r}
 library(tidyverse)
+#library("kableExtra") # not needed for assignment
+#library("dplyr") # not needed as in tidyverse
 ```
 
 
 
-
-
-Getting BLAST
-
 ```{bash}
-mkdir /home/jovyan/applications
 cd /home/jovyan/applications
 curl -O https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
 ```
 
 
-unzipping..
+
 
 
 ```{bash}
@@ -36,31 +31,29 @@ tar -xf ncbi-blast-2.13.0+-x64-linux.tar.gz
 ```
 
 
-Lets see if blast works!
+
+
 
 ```{bash}
 ~/applications/ncbi-blast-2.13.0+/bin/blastx -h
 ```
 
 
-Need to get uniprot swiss-prot fasta to make database.
+
+
 
 ```{bash}
+## &&& not needded - cd data
 cd ../data
 curl -O https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
 mv uniprot_sprot.fasta.gz uniprot_sprot_r2023_01.fasta.gz
 gunzip -k uniprot_sprot_r2023_01.fasta.gz
-
-```
-
-
-Did that work? 
-```{bash}
 ls ../data
 ```
 
 
-# Making a blast database
+
+&&& add some space 
 
 ```{bash}
 ~/applications/ncbi-blast-2.13.0+/bin/makeblastdb \
@@ -70,7 +63,8 @@ ls ../data
 ```
 
 
-# Getting an unknown Query
+
+
 
 ```{bash}
 curl https://eagle.fish.washington.edu/cnidarian/Ab_4denovo_CLC6_a.fa \
@@ -80,8 +74,6 @@ curl https://eagle.fish.washington.edu/cnidarian/Ab_4denovo_CLC6_a.fa \
 
 
 
-Checking it out 
-
 ```{bash}
 head ../data/Ab_4denovo_CLC6_a.fa
 echo "How many sequences are there?"
@@ -89,7 +81,6 @@ grep -c ">" ../data/Ab_4denovo_CLC6_a.fa
 ```
 
 
-# Running Blastx
 
 ```{bash}
 ~/applications/ncbi-blast-2.13.0+/bin/blastx \
@@ -102,54 +93,70 @@ grep -c ">" ../data/Ab_4denovo_CLC6_a.fa
 -outfmt 6
 ```
 
-Lets have a quick look
+
 
 ```{bash}
 head -2 ../output/Ab_4-uniprot_blastx.tab
 wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
 
+&&& this puts table in code directory
 
-CS: I am stuck here... keep getting an error (tr: write error: Broken pipe)
+```{bash}
+curl -o "uniprot_table_r2023_01.tab" -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab"
+```
 
-SR: no isssue for me
+
+```{bash}
+head -2 ../output/Ab_4-uniprot_blastx.tab
+wc -l ../output/Ab_4-uniprot_blastx.tab
+```
 
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab | head -2
 ```
-
-
-
-CS : the chunk below won't run (doesn't even show errors--it just buffers breifly)
-
-SR : no problem for me...
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab \
 > ../output/Ab_4-uniprot_blastx_sep.tab
 ```
 
+#this chunk works but is not consistent with the assignement instructions (it uses a .fasta file instead 
+# of a .tab)
 
+&&& code does not work as table is in code directory (see above)
 
-#this says that in file(file, "rt") that it cannot open this file (no file/directory)
-#not sure why it says this becuase this exact file is in my output folder
-
-SR - this needs to be a chunk..
-see also https://github.com/course-fish546-2023/assistance/issues/6#issuecomment-1491249160
+```{bash}
+head -2 ../data/uniprot_table_r2023_01.tab
+wc -l ../data/uniprot_table_r2023_01.tab
+```
 
 ```{r}
 bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
 ```
 
 
-
-#same error message as above 
-sr:fixed
+&&& I altered below to work
 
 ```{r}
-spgo <- read.csv("../data/uniprot_sprot_r2023_01.fasta", sep = '\t', header = TRUE)
+spgo <- read.csv("../code/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
+```
+
+```{r}
+str(spgo)
 ```
 
 
 ```{r}
-str(spgo)
+left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab")) %>%
+  write_delim("../output/blast_annot_go.tab", delim = '\t')
+```
+
+```{r}
+annot_tab <- read.csv("../output/blast_annot_go.tab", sep = '\t', header = TRUE)
+```
+
+```{r}
+str(annot_tab)
 ```
