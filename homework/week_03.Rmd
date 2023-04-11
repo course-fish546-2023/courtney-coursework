@@ -24,4 +24,9 @@ ggplot(data = mpg) +
 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+  
+  
+#### 4. Of the many things we have done in class the past two weeks, what is one aspect you would like to revisit and spend more time on?
+
+I would like to revisit the DGE table that we created using DESeq2. I'm not totally sure that I understand what we can take away from that information so it would be nice to walk through how to interpret it. 
 
