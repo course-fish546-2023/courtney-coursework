@@ -4,78 +4,98 @@ author: "Courtney Skalley"
 date: "April 13, 2023"
 output: 
   html_document:
-    theme: monochrome
+    theme: readable
     toc: true
     toc_float: true
     number_sections: true
     code_folding: show
 ---
 
-## Introduction
+# Introduction
 
-This is a report created using RMarkdown. It includes code for downloading a multi-fasta file and annotating it using blast.
+This is a report created using RMarkdown. It includes code for downloading a multi-fasta file and annotating it using blast. Blast software can be downloaded [here](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/).
 
-Blast software can be downloaded [here](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/).
+## Download Software
 
-
-# Download Software
-
-```{r}
+```{r setup, include=FALSE}
+library(knitr)
 library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
 ```
 
 ```{bash}
+#select directory to download the software
 cd /home/jovyan/applications
+# download the software
 curl -O https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
-```
-
-
-
-```{bash}
-#unzip the file
-cd /home/jovyan/applications
+# unzip the file
 tar -xf ncbi-blast-2.13.0+-x64-linux.tar.gz
-```
-
-
-```{bash}
+# check that the software is working
 ~/applications/ncbi-blast-2.13.0+/bin/blastx -h
 ```
 
+## Create blast database
 
 ```{bash}
+# download the file from the url
 curl -O https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
+# rename the file
 mv uniprot_sprot.fasta.gz uniprot_sprot_r2023_01.fasta.gz
+# unzip the file
 gunzip -k uniprot_sprot_r2023_01.fasta.gz
+# list the files in the data directory
 ls ../data
 ```
 
-
-
 ```{bash}
-~/applications/ncbi-blast-2.13.0+/bin/makeblastdb \
+#create Blast database using makeblastdb
+~/applications/ncbi-blast-2.13.0+/bin/makeblastdbcd  \
+#specify file name and location to be used to make database
 -in ../data/uniprot_sprot_r2023_01.fasta \
+#specify the type of data
 -dbtype prot \
+#specify output file name and location
 -out ../blastdb/uniprot_sprot_r2023_01
 ```
 
+## Get the query sequence
+
 ```{bash}
+#download the sequences
 curl https://eagle.fish.washington.edu/cnidarian/Ab_4denovo_CLC6_a.fa \
 -k \
+#specify where they will be downloaded to and the file name
 > ../data/Ab_4denovo_CLC6_a.fa
 ```
 
 ```{bash}
+#look at the data
 head ../data/Ab_4denovo_CLC6_a.fa
 echo "How many sequences are there?"
 grep -c ">" ../data/Ab_4denovo_CLC6_a.fa
 ```
 
+## Run blast on the query sequence
+
 ```{bash}
 ~/applications/ncbi-blast-2.13.0+/bin/blastx \
 -query ../data/Ab_4denovo_CLC6_a.fa \
 -db ../blastdb/uniprot_sprot_r2023_01 \
+#create a blast table in the output directory
 -out ../output/Ab_4-uniprot_blastx.tab \
+#add specifications to blast
 -evalue 1E-20 \
 -num_threads 20 \
 -max_target_seqs 1 \
@@ -83,64 +103,64 @@ grep -c ">" ../data/Ab_4denovo_CLC6_a.fa
 ```
 
 ```{bash}
-head -2 ../output/Ab_4-uniprot_blastx.tab
-wc -l ../output/Ab_4-uniprot_blastx.tab
-```
-
-&&& this puts table in code directory
-
-```{bash}
 curl -o "uniprot_table_r2023_01.tab" -H "Accept: text/plain; format=tsv" "https://gannet.fish.washington.edu/seashell/snaps/uniprot_table_r2023_01.tab"
 ```
 
 ```{bash}
+#look at the table
 head -2 ../output/Ab_4-uniprot_blastx.tab
 wc -l ../output/Ab_4-uniprot_blastx.tab
 ```
+
+## Join the blast table with the annotation table
 
 ```{bash}
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab | head -2
 ```
 
 ```{bash}
+#replace  "|" with "\t" in the file "Ab_4-uniprot_blastx.tab"
 tr '|' '\t' < ../output/Ab_4-uniprot_blastx.tab \
+#save the output to the file "Ab_4-uniprot_blastx_sep.tab"
 > ../output/Ab_4-uniprot_blastx_sep.tab
 ```
 
-#this chunk works but is not consistent with the assignement instructions (it uses a .fasta file instead \# of a .tab)
-
-&&& code does not work as table is in code directory (see above)
-
 ```{bash}
+#look at the table
 head -2 ../data/uniprot_table_r2023_01.tab
 wc -l ../data/uniprot_table_r2023_01.tab
 ```
 
 ```{r}
+#assign blast table to bltabl
 bltabl <- read.csv("../output/Ab_4-uniprot_blastx_sep.tab", sep = '\t', header = FALSE)
 ```
 
-&&& I altered below to work
-
 ```{r}
-spgo <- read.csv("../code/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
+#assign annotation table to spgo
+spgo <- read.csv("../output/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE)
 ```
 
 ```{r}
+#view the structure of the annotation table
 str(spgo)
 ```
 
 ```{r}
+#use left_joion to merge bltablt and spgo
 left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
   select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process., Gene.Ontology.IDs) %>% mutate(V1 = str_replace_all(V1, 
             pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab")) %>%
+  #save new table to output as "blast_annot_go.tab"
   write_delim("../output/blast_annot_go.tab", delim = '\t')
 ```
 
 ```{r}
+#assign "blast_annot_go.tab" to "annot_tab"
 annot_tab <- read.csv("../output/blast_annot_go.tab", sep = '\t', header = TRUE)
 ```
 
 ```{r}
+#look at structure of "annot_tab"
 str(annot_tab)
 ```
