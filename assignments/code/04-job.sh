@@ -33,3 +33,7 @@ echo "yah! I did it!!!!!!!!!!"
 
 #this writes out  tofile
 echo "yah! I did it!!!!!!!!!!" > text.file
+
+
+#move from raven to mox 
+# rsync -avz assignments/code/04-* skalleyc@mox.hyak.uw.edu:/gscratch/scrubbed/skalleyc/assign_04
