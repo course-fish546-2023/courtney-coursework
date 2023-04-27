@@ -1,0 +1,36 @@
+---
+title: "week_03"
+output: html_document
+date: "2023-04-10"
+---
+
+#### 1. An R Markdown file is plain text file that contains what 3 important types of content?
+
+-   An (optional) YAML header surrounded by - - -.
+-   Chunks of R code surrounded by \`\`\`.
+-   Text mixed with simple text formatting like \# heading and *italics*.
+
+#### 2. What is a chunk and how do you add them? of the many chunk options which one do you think you will use the most and why? How is inline code different than code chunks?
+
+A chunk is a runable piece of code, usually intended separate lines of code into sections with a certain function. They can be added by using command+alt+I, clicking the chunk button, or manually typing out '''{R/bash/etc,.} .....'''. Now that I know the shortcut, I will be using that the most. Also, I learned that you can name chunks to jump to specific ones, which I imagine will be super helpful in this class.
+
+Inline code is different than chunks because it embeds code directly into text so that when the Rmd file is knit, the actual data will be displayed (not the code itself).
+
+#### 3. What's gone wrong with this code? Why are the points not blue?
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+#the function aes() maps aesthetics to variables. Since "blue" isn't a variable of the mpg data set, it doesn't make much sense here. Instead, blue should be called outside of aes() to manually set an aesthetic about the plot. 
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+  
+  
+#### 4. Of the many things we have done in class the past two weeks, what is one aspect you would like to revisit and spend more time on?
+
+I would like to revisit the DGE table that we created using DESeq2. I'm not totally sure that I understand what we can take away from that information so it would be nice to walk through how to interpret it. 
+
+
+#### 4. Of the many things we have done in class the past two weeks, what is one aspect you would like to revisit and spend more time on?
+
+
