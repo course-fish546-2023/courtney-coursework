@@ -1,0 +1,26 @@
+---
+title: "Presentation"
+format:
+  revealjs: 
+    theme: moon
+---
+
+## Ocean
+
+The ocean (also the sea or the world ocean) is the body of salt water that covers approximately 70.8% of the Earth and contains 97% of Earth's water.\[1\] To learn more about the oceans see <https://en.wikipedia.org/wiki/Ocean>.
+
+## Aquatic Animals
+
+When you click the **Render** button a document will be generated that includes:
+
+-   Fish
+-   Crabs
+-   Whales
+
+## Code
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
