@@ -3,3 +3,9 @@
 .RData
 .Ruserdata
 assignments/blastdb
+assignments/data
+assignments/output/kallisto_01/
+assignments/output/F143_mpileup_output.txt
+assignments/output/F143_cgigas.sam
+assignments/output/F143_cgigas.bam
+assignments/output/F143_cgigas_sorted.bam
