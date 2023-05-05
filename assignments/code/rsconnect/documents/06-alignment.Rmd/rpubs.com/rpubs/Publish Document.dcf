@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/1038394/8f1a33c8d91c40398462c628bb838cf5
+bundleId: https://api.rpubs.com/api/v1/document/1038394/8f1a33c8d91c40398462c628bb838cf5
+url: http://rpubs.com/cskalley/1038394
+when: 1683331039.31557
+lastSyncTime: 1683331039.31558

@@ -1,22 +1,32 @@
 ---
-title: "06-SAMBAM"
-output: html_document
-date: "2023-05-02"
+title: "06_alignment"
+author: "Courtney Skalley"
+date: "May 05, 2023"
+output: 
+  html_document:
+    theme: readable
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    eval: FALSE
 ---
 
-### Link to published data
+# Alignment Data
 
-<Rpubs> []
+## SAMs and BAMs
+
+[Alignment on RPubs](https://rpubs.com/cskalley/1038394)
 
 ### Downloading alignment data (BAM)
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 cd ../data
 curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam
 curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam.bai
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 cd ../data
 curl -O https://gannet.fish.washington.edu/seashell/bu-mox/data/Cvirg-genome/GCF_002022765.2_C_virginica-3.0_genomic.fa
 curl -O https://gannet.fish.washington.edu/seashell/bu-mox/data/Cvirg-genome/GCF_002022765.2_C_virginica-3.0_genomic.fa.fai
@@ -30,13 +40,13 @@ curl -O https://gannet.fish.washington.edu/seashell/bu-mox/data/Cvirg-genome/GCF
 
 ### Aligning WGS data and visualizing in IGV
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 cd ../data
 curl -O https://owl.fish.washington.edu/nightingales/C_gigas/F143n08_R2_001.fastq.gz
 curl -O https://owl.fish.washington.edu/nightingales/C_gigas/F143n08_R1_001.fastq.gz
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 cd ../data
 curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/cgigas_uk_roslin_v1_genomic-mito.fa
 curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/cgigas_uk_roslin_v1_genomic-mito.fa.fai
@@ -45,13 +55,13 @@ curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/GCF_902806645.1_cgi
 
 ### Alignment
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 /home/shared/hisat2-2.2.1/hisat2-build \
 -f ../data/cgigas_uk_roslin_v1_genomic-mito.fa \
 ../output/cgigas_uk_roslin_v1_genomic-mito.index
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/cgigas_uk_roslin_v1_genomic-mito.index \
 -p 4 \
@@ -62,20 +72,20 @@ curl -O https://gannet.fish.washington.edu/panopea/Cg-roslin/GCF_902806645.1_cgi
 
 #Look at the data
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 tail -1 ../output/F143_cgigas.sam
 
 #OR COULD (MAYBE) USE THIS:
 tail -1 /home/shared/8TB_HDD_01/sr320/github/steven-coursework/assignments/output/F143_cgigas.sam
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 # Convert SAM to BAM, using 4 additional threads
 /home/shared/samtools-1.12/samtools view -@ 4 -bS \
 ../output/F143_cgigas.sam > ../output/F143_cgigas.bam
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 # Sort the BAM file, using 4 additional threads
 /home/shared/samtools-1.12/samtools sort -@ 4 \
 ../output/F143_cgigas.bam -o ../output/F143_cgigas_sorted.bam
@@ -87,23 +97,23 @@ tail -1 /home/shared/8TB_HDD_01/sr320/github/steven-coursework/assignments/outpu
 
 ### mpileup using bcftools
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 /home/shared/bcftools-1.14/bcftools mpileup --threads 4 --no-BAQ \
 --fasta-ref ../data/cgigas_uk_roslin_v1_genomic-mito.fa \
 ../output/F143_cgigas_sorted.bam > ../output/F143_mpileup_output.txt
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 tail ../output/F143_mpileup_output.txt
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 cat ../output/F143_mpileup_output.txt \
 | /home/shared/bcftools-1.14/bcftools call -mv -Oz \
 > ../output/F143_mpile.vcf.gz
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 zgrep "^##" -v ../output/F143_mpile.vcf.gz | \
 awk 'BEGIN{OFS="\t"} {split($8, a, ";"); print $1,$2,$4,$5,$6,a[1],$9,$10}' | head
 
@@ -111,7 +121,7 @@ awk 'BEGIN{OFS="\t"} {split($8, a, ";"); print $1,$2,$4,$5,$6,a[1],$9,$10}' | he
 
 The code below might not work. That is fine. The VCF in the above chunk can be used for visualization in IGV.
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 /home/shared/bcftools-1.14/bcftools call \
 -v -c ../output/F143_mpile.vcf.gz \
 > ../output/F143_mpile_calls.vcf
@@ -125,7 +135,7 @@ The code below might not work. That is fine. The VCF in the above chunk can be u
 
 #### bam file (raw)
 
-```{r, engine='bash'}
+```{r, engine='bash', eval = FALSE}
 tail -20 ../output/F143_cgigas.bam
 ```
 
