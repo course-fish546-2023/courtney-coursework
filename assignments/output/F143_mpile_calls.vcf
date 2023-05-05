@@ -261,7 +261,7 @@
 ##INFO=<ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
 ##INFO=<ID=MQ,Number=1,Type=Integer,Description="Average mapping quality">
 ##bcftools_callVersion=1.14+htslib-1.14
-##bcftools_callCommand=call -mv -Oz; Date=Thu May  4 12:11:43 2023
+##bcftools_callCommand=call -mv -Oz; Date=Fri May  5 14:44:42 2023
 ##INFO=<ID=AF1,Number=1,Type=Float,Description="Max-likelihood estimate of the first ALT allele frequency (assuming HWE)">
 ##INFO=<ID=AF2,Number=1,Type=Float,Description="Max-likelihood estimate of the first and second group ALT allele frequency (assuming HWE)">
 ##INFO=<ID=AC1,Number=1,Type=Float,Description="Max-likelihood estimate of the first ALT allele count (no HWE assumption)">
@@ -269,5 +269,5 @@
 ##INFO=<ID=PV4,Number=4,Type=Float,Description="P-values for strand bias, baseQ bias, mapQ bias and tail distance bias">
 ##INFO=<ID=G3,Number=3,Type=Float,Description="ML estimate of genotype frequencies">
 ##INFO=<ID=HWE,Number=1,Type=Float,Description="Chi^2 based HWE test P-value based on G3">
-##bcftools_callCommand=call -v -c ../output/F143_mpile.vcf.gz; Date=Thu May  4 12:28:08 2023
+##bcftools_callCommand=call -v -c ../output/F143_mpile.vcf.gz; Date=Fri May  5 14:45:01 2023
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	../output/F143_cgigas_sorted.bam
