@@ -2,4 +2,11 @@ uniprot_sprot_r2023_01.fasta
 uniprot_sprot_r2023_01.fasta.gz
 cgigas_roslin_rna.index
 rna.fna
-~/courtney-coursework/assignments/data
+~/courtney-coursework/assignments/data/*.fna
+~/courtney-coursework/assignments/data/*.fastq.gz
+~/courtney-coursework/assignments/data/*.fastq.gz
+~/courtney-coursework/assignments/data/*.gtf
+~/courtney-coursework/assignments/data/*.fa
+~/courtney-coursework/assignments/data/*.index
+~/courtney-coursework/assignments/data/*.bam
+
