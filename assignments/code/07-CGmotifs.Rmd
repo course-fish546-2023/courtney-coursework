@@ -9,12 +9,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+[Link to visual report](https://rpubs.com/cskalley/1040657)
+
 ```{bash}
 cd ../data
 curl -O https://owl.fish.washington.edu/halfshell/genomic-databank/cbai_genome_v1.01.fasta 
 ls ../data
 ```
-
 
 ```{r}
 library(seqinr)
@@ -22,7 +23,6 @@ library(seqinr)
 input_file <- "../data/cbai_genome_v1.01.fasta"
 sequences <- read.fasta(input_file)
 ```
-
 
 ```{r}
 # Set the seed for reproducibility (optional)
@@ -45,7 +45,6 @@ output_file <- "../output/07-output.fa"
 write.fasta(selected_sequences, names(selected_sequences), output_file, open = "w")
 ```
 
-
 ```{bash}
 # download index file
 cd ../data
@@ -63,3 +62,6 @@ ls ../data
 fuzznuc -sequence ../output/07-output.fa -pattern CG -rformat gff -outfile ../output/CGoutput.gff
 ```
 
+![IGV screenshot of CG motifs](images/07_IGV_01-01.png)
+
+![IGV screenshot of CG motifs](images/07_IGV_02-01.png)
