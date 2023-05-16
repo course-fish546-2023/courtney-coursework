@@ -25,7 +25,7 @@ cd ../data
 curl -O https://eagle.fish.washington.edu/Cvirg_tracks/C_virginica-3.0_Gnomon_genes.bed
 ```
 
-# convert BED file to BAM
+# convert BAM file to BED
 
 ```{bash, convert BED to BAM}
 /home/shared/bedtools2/bin/bedtools bamtobed  -i ../data/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam > ../output/08-19F.bed
@@ -47,7 +47,8 @@ curl -O https://eagle.fish.washington.edu/Cvirg_tracks/C_virginica-3.0_Gnomon_ge
 # Download BED file of Transposable Elements and lncRNAs
 ```{bash, download transposbale elements and lncRNAs}
 cd ../data
-curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_gene.gff curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_rm.te.bed 
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_gene.gff 
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_rm.te.bed 
 curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_lncRNA.gff
 ```
 
@@ -63,7 +64,7 @@ head -2 ../output/08-gene-TE-intersect.out
 # search for overlapping features in a and b
 ```{bash, bedtools closest}
 /home/shared/bedtools2/bin/bedtools closest \
--a ../data//cgigas_uk_roslin_v1_lncRNA.gff\
--b ./data/cgigas_uk_roslin_v1_gene.gff \
+-a ../data/cgigas_uk_roslin_v1_lncRNA.gff \
+-b ../data/cgigas_uk_roslin_v1_gene.gff \
 > ../output/08-lnc-gene-closet.out
 ```
