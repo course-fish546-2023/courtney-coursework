@@ -1,0 +1,69 @@
+---
+title: "08-coverage"
+author: "Courtney Skalley"
+date: "2023-05-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# download BAM and sorted.BAM files
+
+```{bash, download BAM files}
+cd ../data 
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam 
+curl -O https://gannet.fish.washington.edu/seashell/bu-mox/scrubbed/120321-cvBS/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam.bai
+```
+
+
+# download BED file with gene information
+```{bash, download data}
+cd ../data 
+curl -O https://eagle.fish.washington.edu/Cvirg_tracks/C_virginica-3.0_Gnomon_genes.bed
+```
+
+# convert BED file to BAM
+
+```{bash, convert BED to BAM}
+/home/shared/bedtools2/bin/bedtools bamtobed  -i ../data/19F_R1_val_1_bismark_bt2_pe.deduplicated.sorted.bam > ../output/08-19F.bed
+```
+
+#Report: 
+## 1. The number of features in B that overlapped (by at least one base pair) the A interval.
+## 2. The number of bases in A that had non-zero coverage from features in B.
+## 3. The length of the entry in A.
+## 4. The fraction of bases in A that had non-zero coverage from features in B.
+```{bash, bedtools coverage}
+/home/shared/bedtools2/bin/bedtools coverage \
+-a ../data/C_virginica-3.0_Gnomon_genes.bed \
+-b ../output/08-19F.bed \
+> ../output/08-gene-19F-coverage.out
+```
+
+
+# Download BED file of Transposable Elements and lncRNAs
+```{bash, download transposbale elements and lncRNAs}
+cd ../data
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_gene.gff curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_rm.te.bed 
+curl -O http://owl.fish.washington.edu/halfshell/genomic-databank/cgigas_uk_roslin_v1_lncRNA.gff
+```
+
+```{bash, bedtools intersect}
+/home/shared/bedtools2/bin/bedtools intersect \
+-a ../data/cgigas_uk_roslin_v1_gene.gff \
+-b ../data/cgigas_uk_roslin_v1_rm.te.bed \
+> ../output/08-gene-TE-intersect.out
+
+head -2 ../output/08-gene-TE-intersect.out
+```
+
+# search for overlapping features in a and b
+```{bash, bedtools closest}
+/home/shared/bedtools2/bin/bedtools closest \
+-a ../data//cgigas_uk_roslin_v1_lncRNA.gff\
+-b ./data/cgigas_uk_roslin_v1_gene.gff \
+> ../output/08-lnc-gene-closet.out
+```
