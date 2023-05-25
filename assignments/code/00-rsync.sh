@@ -1,0 +1,1 @@
+rsync -avz courtney-coursework/ skalleyc@mox.hyak.uw.edu:/gscratch/scrubbed/skalleyc/
